@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="buyListSQL">
+	<select id="getAllBuyList" resultType="buylist">
+		select * from buylist order by serial desc
+	</select>
+	
+	<select id="getDeliveryDetail" parameterType="String" resultType="java.util.Map">
+		select main_codename, img, item.name, color, size1, size2, serialmapper.price, serialmapper.count 
+		from serialmapper
+		join buylist using(serial)
+		join item using(seq)
+		where serial=#{serial}
+	</select>
+	
+	<select id="getDeliveryTotalA" parameterType="map" resultType="int">
+		select count(*) from buylist
+		where status like '%${status}%' and status != '취소'
+		<if test="id != null">
+		and id = #{id}
+		</if>
+		<if test="startDate != null and endDate != null">
+		and logtime between #{startDate} and to_date(#{endDate}, 'YYYY-MM-DD')+1
+		</if>
+		order by serial desc
+	</select>
+	
+	<select id="getBuyList" parameterType="map" resultType="buylist">
+		select * from
+		(select rownum rn, tt.* from
+		(select * from buylist
+		where status like '%${status}%' and status != '취소'
+		<if test="id != null">
+		and id = #{id}
+		</if>
+		<if test="startDate != null and endDate != null">
+		and logtime between #{startDate} and to_date(#{endDate}, 'YYYY-MM-DD')+1
+		</if>
+		order by serial desc)tt
+		)where rn between ${startNum} and ${endNum}
+	</select>
+	
+	<update id="changeStatus" parameterType="map">
+		update buylist set status=#{status}
+		<if test="parcel != null">
+		,parcel=#{parcel} ,parcel_code=#{parcel_code} where serial=#{serial}
+		</if>
+		<if test="serials != null"> 
+		where serial in
+		<foreach collection="serials" item="serial" separator="," open="(" close=")">
+			#{serial}
+		</foreach>
+		</if>
+	</update>
+	
+	<select id="SalesList" parameterType="java.util.Map" resultType="java.util.Map">
+		select * from
+		(select rownum rn, tt.* from
+		(select * from serialmapper
+		join buylist using(serial)
+		join item using(seq)
+		where main_codename like '%${status1}%' and sub_codename like '%${status2}%'
+		and logtime between #{startDate} and to_date(#{endDate}, 'YYYY-MM-DD')+1
+		order by serial desc)tt
+		)where rn between ${startNum} and ${endNum}
+	</select>
+	
+	<select id="searchText" parameterType="java.util.Map" resultType="java.util.Map">
+		select * from
+		(select rownum rn, tt.* from(
+		select * from serialmapper
+		join buylist using(serial)
+		join item using(seq)
+		where name like '%${text}%' order by serial desc)tt 
+		)where rn between ${startNum} and ${endNum}
+	</select>
+	
+	<select id="getSalesTotalA" parameterType="java.util.Map" resultType="int">
+		select count(*) from serialmapper
+		join buylist using(serial)
+		join item using(seq)
+		where main_codename like '%${status1}%' and sub_codename like '%${status2}%'
+		and logtime between #{startDate} and to_date(#{endDate}, 'YYYY-MM-DD')+1
+		order by serial desc
+	</select>
+	
+	<select id="getSearchTotalA" parameterType="java.util.Map" resultType="int">
+		select count(*) from serialmapper
+		join buylist using(serial)
+		join item using(seq)
+		where name like '%${text}%' order by serial desc
+	</select>
+	
+	<!-- 로그인한 회원의 배송중인 주문의 개수 -->
+	<select id="getDeliveryCountOfMember" parameterType="String" resultType="int">
+		select count(*) from buylist where id=#{id} and status='배송중'
+	</select>
+	
+	<select id="getBuyListCount" parameterType="map" resultType="map">
+		select count(*) as count, sum(sum) as sum from (
+		select serial, id, logtime, status, sum(price) as sum from buylist
+		join serialmapper using (serial)
+		group by (serial, id, logtime, status)
+		having id=#{id} and status='배송완료'
+		and logtime between #{startDate} and to_date(#{endDate}, 'YYYY-MM-DD')+1
+		)
+	</select>
+	
+	<!-- myPageIndex 최근 5개 주문리스트-->
+	<select id="get5BuyList" parameterType="String" resultType="map">
+		select buylist.logtime, serial, main_codename, img, item.name, color, serialmapper.price, serialmapper.count 
+		from buylist
+		join serialmapper using(serial)
+		join item using (seq)
+		where serial in 
+		(select distinct serial from buylist where id=#{id} and rownum &lt;= 5)
+	</select>
+	
+	<select id="getSerialCount" parameterType="String" resultType="int">
+		select count(*) from serialmapper where serial=#{serial} 
+	</select>
+	
+	<!-- checkout -->
+	<select id="getoriginList" parameterType="String" resultType="buylist">
+		select * from buylist where id=#{id}
+	</select>
+	
+</mapper>

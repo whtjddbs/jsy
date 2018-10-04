@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="itemSQL">
+ 	<!--  왼쪽 카테고리 가져오기 -->
+ 	<select id="getCategory" resultType="item">
+ 		select distinct main_codename from item
+ 	</select>
+ 	
+ 	<select id="getImageList" parameterType="java.util.Map" resultType="java.util.Map">
+	 		select seq,nvl(count,0) as count,nvl(reviewcount,0) as reviewcount, 
+	 			   name,price, main_codename, sub_codename,img,discount from (
+			select * from item 
+ 				where main_codename=#{main_codename} AND rownum &lt;=5 order by seq desc
+			) left join (
+				select seq, count(*) as count from wishlist group by seq
+			) using (seq)
+			left join (
+				select seq, count(*) as reviewcount from item_review group by seq
+			) using (seq) order by seq desc
+ 	</select>
+ 	
+ 	<select id="getItemList" resultType="item">
+		select distinct main_codename from item
+ 	</select>
+ 	
+ 	<select id="getInfoList" parameterType="java.util.Map" resultType="java.util.Map">
+		select * from
+       		(select rownum rn, tt.*from
+        	(select seq,nvl(count,0) as count,nvl(reviewcount,0) as reviewcount, name,price, 
+        			main_codename, sub_codename,img,discount from (
+			select * from item 
+ 				where main_codename=#{main_codename} and sub_codename like '%${sub_codename}%' order by seq desc
+			) left join (
+			select seq, count(*) as count from wishlist group by seq
+			) using (seq)
+			left join (
+				select seq, count(*) as reviewcount from item_review group by seq 
+			) using (seq) order by seq desc )tt
+			)where rn between #{startNum} and #{endNum}
+			
+ 	</select>
+ 	
+ 	<select id="getTotalA" parameterType="java.util.Map" resultType="int">
+ 		select count(*)from item where main_codename=#{main_codename} and sub_codename like '%${sub_codename}%'
+ 	</select>
+ 	
+ 	<select id="getAllTotalA" resultType="int">
+  		select count(*) from item
+	 			where main_codename like '%'||#{main_codename}||'%' 
+	 			and sub_codename like '%'||#{sub_codename}||'%'
+	 			and price between #{startPrice} and #{endPrice} 
+	 			and name like '%'||#{name}||'%'
+				order by seq desc
+  	</select>
+  	
+  	<select id="getBestTotalA" parameterType="java.util.Map" resultType="int">
+  		select count(*) from (
+					select seq, sum(count) as sum from serialmapper group by seq
+				) join item using(seq)
+				left join (
+    				select seq, count(*) as wishlistcount from wishlist group by seq
+				) using (seq)
+				left join (
+    				select seq, count(*) as reviewcount from item_review group by seq
+				) using (seq)
+					where main_codename=#{main_codename}
+  	</select>
+ 	
+ 	<select id="getSubList" parameterType="String" resultType="String">
+ 		select distinct sub_codename from item where main_codename=#{main_codename}
+ 	</select>
+ 
+ 	<!-- 위시리스트에 담긴 아이템 정보 가져오기 -->
+ 	<select id="wishList" parameterType="map" resultType="item">
+ 		select * from
+		(select rownum rn, tt.* from (
+ 		select * from item where seq in (select seq from wishlist where id=#{id}))tt
+		)where rn between ${startNum} and ${endNum}
+ 	</select>
+ 	
+ 	<select id="getWishListCount" parameterType="String" resultType="int">
+		select count(*) from wishlist where id=#{id}
+	</select>
+	
+	<!-- itemView -->
+	<select id="getColor" parameterType="int" resultType="String">
+ 		select distinct color from item
+		join item_info using(seq)
+		where seq=#{seq}
+ 	</select>
+ 	
+ 	<select id="getSize1" parameterType="java.util.Map" resultType="String">
+		select distinct size1 from item
+		join item_info using(seq)
+		where seq=${seq} and color=#{color} 
+ 	</select>
+ 	
+ 	<select id="getSize2" parameterType="java.util.Map" resultType="String">
+		select distinct size2 from item
+		join item_info using(seq)
+		where seq=${seq} and color=#{color} and size1=#{size1}
+ 	</select>
+ 	
+ 	<select id="getItemDTO" parameterType="int" resultType="item">
+ 		select * from item where seq=#{seq}
+ 	</select>
+ 	
+ 	<select id="checkMain_codename" resultType="String">
+ 		select distinct main_codename from item
+ 	</select>
+ 	
+ 	<select id="checkSub_codename" parameterType="String" resultType="String">
+ 		select distinct sub_codename from item where main_codename = #{main_codename}
+ 	</select>
+ 	
+ 	<select id="getSerialMapper" parameterType="String" resultType="map">
+ 		select * from serialmapper
+		join item using (seq)
+		join buylist using (serial)
+ 		where serial = #{serial}
+ 	</select>
+ 	
+ 	<!-- 상품 검색 -->
+ 	<select id="getSearchFormList" parameterType="java.util.Map" resultType="item">
+ 		select * from 
+			(select rownum rn, tt.* from 
+			(select * from item where name like '%'||#{name}||'%' order by seq desc)tt
+			) where rn <![CDATA[>=]]>#{startNum} and rn <![CDATA[<=]]> #{endNum}
+ 	</select>
+ 
+ 	<!-- main_recommendation 띄우기  -->
+ 	<select id="getRecommendation" parameterType="String" resultType="item">
+ 		select * from
+		(select rownum rn, tt.*from
+		(select * from item 
+		 where main_codename=#{main_codename} order by seq desc)tt
+		)where rn between 1 and 5
+ 	</select>
+ 	
+ 	<select id="getSearchFormTotalA" parameterType="String" resultType="int">
+  		select count(*) from item where name like '%'||#{name}||'%'
+  	</select>
+  	
+  	<!-- BEST index에 뿌릴 list -->
+ 	<select id="getBestImageList"  parameterType="String" resultType="java.util.Map">
+    	select seq, sum, name, price, main_codename, sub_codename, img, discount, 
+       		   nvl(wishlistcount,0) wishlistcount, nvl(reviewcount,0) reviewcount from (
+			select rownum rn, tt.* from (
+			select * from (
+				select seq, sum(count) as sum from serialmapper group by seq
+				) join item using(seq)
+			left join (
+   				 select seq, count(*) as wishlistcount from wishlist group by seq
+				) using (seq)
+			left join (
+    			 select seq, count(*) as reviewcount from item_review group by seq
+			) using (seq)
+				 where main_codename=#{main_codename} order by sum desc
+			)tt
+			)where rn &lt;= 5
+ 	</select>
+ 	
+ 	<!-- Best -->
+ 	<select id="getBestInfoList" parameterType="java.util.Map" resultType="java.util.Map">	
+		select seq, sum, name, price, main_codename, sub_codename, img, discount, 
+       		nvl(wishlistcount,0) wishlistcount, nvl(reviewcount,0) reviewcount from (
+				select rownum rn, tt.* from (
+				select * from (
+					select seq, sum(count) as sum from serialmapper group by seq
+				) join item using(seq)
+				left join (
+    				select seq, count(*) as wishlistcount from wishlist group by seq
+				) using (seq)
+				left join (
+    				select seq, count(*) as reviewcount from item_review group by seq
+				) using (seq)
+					where main_codename=#{main_codename} order by sum desc
+				)tt
+		)where rn between ${startNum} and ${endNum}
+ 	</select>
+ 	
+ 	
+ 	<!-- 아이템 삭제 -->
+	<delete id="itemDelete" parameterType="String">
+		begin
+		delete item where seq=#{seq};
+		delete item_info where seq=#{seq};
+		end;
+	</delete>
+	
+ 	<!-- 검색 아이템 가져오기 -->
+ 	<select id="itemSearchList" parameterType="java.util.Map" resultType="item">
+		 select * from (  
+			select rownum rn, tt.* from( 
+			select * from item
+	 			where main_codename like '%'||#{main_codename}||'%' 
+	 			and sub_codename like '%'||#{sub_codename}||'%'
+	 			and price between #{startPrice} and #{endPrice} 
+	 			and name like '%'||#{name}||'%'
+				order by seq desc )tt  
+			  )where rn between ${startNum} and ${endNum} 
+ 	</select>
+ 	
+ 	<!-- 아이템 상세설명 -->
+ 	<select id="itemDetailList" parameterType="int" resultType="item_info">
+ 		select * from item_info where seq=#{seq} order by color asc, size1 asc, size2 asc
+ 	</select>
+ 	
+ 	<!-- 아이템 수정 -->
+ 	<update id="itemModify" parameterType="item_info">
+ 		update item_info set color=#{color}
+ 					   		,size1=#{size1}
+ 					  		,size2=#{size2} 
+ 					   		,qty=#{qty} where seq=#{seq} and item_seq=#{item_seq}
+ 	</update>
+ 	
+ 	<!-- 상세 아이템 보기 안에 있는 선택삭제 -->
+ 	<delete id="item_infoDelete" parameterType="String">
+		delete item_info where item_seq=#{item_seq}
+	</delete>
+	
+	
+	<!-- 아이템 등록 -->
+	<insert id="itemAdd" parameterType="java.util.Map">
+	begin
+		insert into item values(item_seq.nextval
+							   ,#{name}
+							   ,#{price}
+							   ,#{main_codename}
+							   ,#{sub_codename}
+							   ,#{img1}
+							   ,0);
+							   
+		insert into item_info values(item_seq.currval
+		                            ,item_info_seq.nextval
+		                            ,#{color}
+		                            ,#{size1}
+		                            ,#{size2}
+		                            ,#{qty});
+		                            
+		insert into item_content values(item_seq.currval
+									   ,#{img2}
+									   ,'상세페이지 참조'
+									   ,'상세페이지 참조'
+									   ,'상세페이지 참조'
+									   ,'(주)BbanB'
+									   ,'한국'
+									   ,'단독 손세탁'
+									   ,'201809'
+									   ,'관련 법 및 소비자 분쟁해결 규정에 따름.AS의 경우 품질 보증 기간 1년'
+									   ,'1234-1234');                      
+		
+	end; 
+	</insert>
+	
+	<!-- 아이템 상세 등록 -->
+	<insert id="itemDetailAdd" parameterType="java.util.Map">
+		insert into item_info values(#{seq}
+		                            ,item_info_seq.nextval
+		                            ,#{color}
+		                            ,#{size1}
+		                            ,#{size2}
+		                            ,#{qty})
+	</insert>
+	
+	<!-- 이벤트 메인 목록 -->
+	<select id="eventMainList" parameterType="java.util.Map" resultType="event">
+		select * from(
+			select rownum rn, tt.* from(
+			select * from event order by seq desc)tt
+			) where rn between ${startNum} and ${endNum}
+
+	</select>
+	
+	<select id="getEventTotalA" resultType="int">
+		select count(*) from event
+	</select>
+	
+	<!-- 이벤트 상세 보기 -->
+	<select id="eventDetailList" parameterType="int" resultType="event">
+		select * from event where seq=#{seq}
+	</select>
+	
+	<!-- 이벤트 등록 -->
+	<insert id="eventAdd" parameterType="java.util.Map">
+		insert into event values(event_seq.nextval
+								,#{img1}
+								,#{title}
+								,#{img2}
+								,#{startDate}
+								,#{endDate})
+	</insert>
+	
+	<!-- 아이템 후기 등록 -->
+	<insert id="itemViewReview" parameterType="java.util.Map">
+		insert into item_review values(#{seq}
+									  ,#{id}
+									  ,#{star}
+									  ,#{comments}
+									  ,#{image}
+									  ,sysdate)
+	</insert>
+	
+	<!-- 아이템QnA 목록 -->
+	<select id="itemQnAList" parameterType="java.util.Map" resultType="java.util.Map">
+		select * from(
+			select rownum rn, tt.* from(
+				select * from item_ask join item on(item_ask.item_seq=item.seq) order by item_seq desc)tt
+			) where rn between ${startNum} and ${endNum}
+	</select>
+	
+	<select id="getItemQnATotalA" resultType="int">
+ 		select count(*) from item_ask
+ 	</select>
+ 	
+ 	<!-- 아이템QnA 답글 수정 -->
+ 	<update id="itemQnAModify" parameterType="java.util.Map">
+ 		update item_ask set reply=#{reply} where seq=#{seq} and item_seq=#{item_seq}
+ 	</update>
+ 	
+ 	<!-- 할인율 수정 -->
+ 	<update id="discountModify" parameterType="java.util.Map">
+ 		update item set discount=${discount}*1/100 where seq in (${seqs})
+ 	</update>
+ 	
+ </mapper>
