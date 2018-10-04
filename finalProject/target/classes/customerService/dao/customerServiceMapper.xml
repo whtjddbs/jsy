@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="customerServiceSQL">
+ 	<!-- FAQ -->
+ 	<select id="getFaqList" parameterType="java.util.Map" resultType="faq">
+ 		select * from (select rownum rn, tt.* from 
+		(select * from faq where type like '%'||#{type}||'%' )tt 
+		)where rn between #{startNum} and #{endNum}
+ 	</select>
+ 	
+ 	<select id="getTotalA" parameterType="String" resultType="int">
+  		select count(*) from faq where type like '%'||#{faq_type}||'%'
+  	</select>
+  	
+  	<select id="searchFaqList" parameterType="java.util.Map" resultType="faq">
+  		select * from (select rownum rn, tt.* from 
+		(select * from faq where title like '%'||#{content}||'%' )tt 
+		)where rn between #{startNum} and #{endNum}
+  	</select>
+  	
+  	<select id="getTotalA2" parameterType="String" resultType="int">
+  		select count(*) from faq where title like '%'||#{search}||'%'
+  	</select>
+  	
+  	<!-- notice -->
+  	<select id="getNoticeTotalA" resultType="int">
+  		select count(*) from notice
+  	</select>
+  	
+ 	<select id="viewNoticeList" parameterType="java.util.Map" resultType="notice">
+	 	select * from 
+			(select rownum rn, tt.* from 
+			(select * from notice order by seq desc)tt
+			) where rn <![CDATA[>=]]>#{startNum} and rn <![CDATA[<=]]> #{endNum}
+	</select>
+	 
+	<insert id="noticeUpload" parameterType="java.util.Map">
+	 	insert into notice values(notice_seq.nextval, #{title}, #{content}, sysdate)
+	</insert>
+	 
+	<!--공지사항 글삭제  -->
+	<delete id="noticeDelete" parameterType="int">
+	 	delete notice where seq=#{seq}
+	</delete>
+	 
+	<!-- 공지사항 글수정 이동 -->
+	<select id="noticeModifyForm" parameterType="int" resultType="notice">
+	 	select * from notice where seq=#{seq}
+	</select>
+	 
+	<!-- 공지사항 글수정 하기 -->
+	<update id="noticeUpdate" parameterType="java.util.Map">
+	 	update notice set title=#{title}, content=#{content} where seq=#{seq}
+	</update>
+	
+	<!-- 1:1 문의 -->
+	<insert id="mantomanWrite" parameterType="mantoman">
+		insert into direct_ask values(direct_ask_seq.nextval, #{type}, #{serial}, #{id}, #{title}, #{content}, #{img}, sysdate)
+  	</insert>
+  	
+  	<select id="getTotalA3" parameterType="String" resultType="int">
+  		select count(*) from direct_ask where id=#{id}
+  	</select>
+  	
+  	<select id="getMantomanList" parameterType="java.util.Map" resultType="mantoman">
+  		select * from (select rownum rn, tt.* from 
+		(select * from direct_ask where id=#{id})tt 
+		)where rn between #{startNum} and #{endNum}
+  	</select>
+  	
+  	<delete id="deleteMtm" parameterType="int">
+  		delete direct_ask where seq=#{seq}
+  	</delete>
+  	
+  	<select id="getTotalA4" parameterType="String" resultType="int">
+  		select count(*) from item_ask where id=#{id}
+  	</select>
+  	
+  	<select id="getMyQnA" parameterType="java.util.Map" resultType="java.util.Map">
+  		select * from (
+		select rownum rn,tt.* from(
+		select item_ask.seq,name,comments,logtime,reply from item_ask join item on(item_ask.ITEM_SEQ=ITEM.SEQ) where id=#{id}
+		)tt
+		) where rn between #{startNum} and #{endNum}
+  	</select>
+  	
+  	<delete id="deleteQnA" parameterType="int">
+  		delete item_ask where seq=#{seq}
+  	</delete>
+</mapper>

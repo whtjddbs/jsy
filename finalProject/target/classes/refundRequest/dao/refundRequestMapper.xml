@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="refundRequestSQL">
+ 	<select id="getRefundList" resultType="java.util.Map" parameterType="java.util.Map">
+		select * from(select rownum rn, 
+		tt.*from(select * from refundrequest where status like '%'||#{status}||'%' and startdate between #{startDate} and to_date(#{endDate}, 'YYYY-MM-DD')+1
+		order by serial desc)tt)
+		where rn between ${startNum} and ${endNum} 
+	</select>
+  	
+  	<select id="getRefundDetail" parameterType="String" resultType="java.util.Map">
+  		select * from serialmapper join buylist using(serial)
+		join item using(seq) 
+		where serial=#{serial}
+	</select>
+  	<select id="getRefundInfo" parameterType="String" resultType="java.util.Map">
+  		select * from refundrequest 
+		where serial=#{serial}
+  	</select>
+  	
+  	<!-- 총 환불/취소 글수 -->
+  	<select id="getRefundTotalA" resultType="int" parameterType="java.util.Map">
+ 		select count(*) from refundrequest 
+ 		where status like '%'||#{status}||'%' and startdate between #{startDate} and to_date(#{endDate}, 'YYYY-MM-DD')+1
+ 		order by serial desc 
+ 	</select>
+  	
+  	<update id="changeRefundInfo"   parameterType="String">
+  		update refundrequest
+  		set enddate = sysdate,
+  			STATUS = '처리완료'
+  		where serial=#{itemSerial}
+  	</update>
+  	
+  	<update id="changAllRefundInfo" parameterType="java.util.Map">
+  		update refundrequest 
+  		set enddate = sysdate,
+  			status = '처리완료'
+  		where serial in
+  		<foreach close=")" open="(" separator="," item="serial" collection="serials">#{serial} </foreach>
+  	</update>
+  	
+  	
+ 	<!-- modifyList All -->
+ 	<select id="viewModifyList" parameterType="java.util.Map" resultType="refundRequest">
+		select * from 
+		(select rownum rn, tt.* from 
+		(select * from refundrequest join buylist using(serial) where id=#{id} order by startdate desc, serial desc)tt
+		) where rn <![CDATA[>=]]>${startNum} and rn <![CDATA[<=]]> ${endNum}
+ 	</select>
+ 	
+ 	<!-- modifyList 총글수 구하기 -->
+  	<select id="getrefundRequestTotalA" parameterType="java.util.Map" resultType="int">
+  		select count(*) from refundrequest join buylist using(serial) where id=#{id}
+  	</select>
+  	
+  	<!-- modifyList 주문취소/상품교환/반품접수 -->
+  	<select id="vieworderType" parameterType="java.util.Map" resultType="refundRequest">
+  		select * from 
+			(select rownum rn, tt.* from 
+			(select * from refundrequest join buylist using(serial) where type=#{type} and id=#{id} order by startdate desc, serial desc)tt
+			) where rn <![CDATA[>=]]>${startNum} and rn <![CDATA[<=]]> ${endNum}
+  	</select>
+  	
+  	<!-- modifyList type총글수 -->
+  	<select id="getorderTypeTotalA" parameterType="java.util.Map" resultType="int">
+  		select count(*) from refundrequest  join buylist using(serial) where type=#{type} and id=#{id}
+  	</select>
+  	
+ </mapper>

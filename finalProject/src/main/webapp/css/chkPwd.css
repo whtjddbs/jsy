@@ -1,0 +1,31 @@
+@charset "UTF-8";
+
+
+  fieldset{padding:0;border:0}
+  .inpbx{position:relative;height:40px;border:1px solid #d4d4d4;background:#fff}
+  .inpbx,   .inpbx input{/* vertical-align:top; */box-sizing:border-box}
+  .inpbx input{display:block;width:100%;height:100%;padding:0 14px;font-size:15px;color:#1a1a1a;border:0;background:transparent;outline:none}
+
+  .btn_bor{border:1px solid #d4d4d4;border-radius:2px;font-size:12px;color:#5d5d5d;line-height:30px;text-align:center}
+  .btn_black,   .btn_bor{display:inline-block;box-sizing:border-box}
+  .btn_black{min-width:82px;padding:0 17px;border:1px solid #303033;background:#303033;font-size:13px;color:#fff;line-height:40px}
+  .article_right{overflow:hidden;}
+
+
+  @media screen and (max-width:540px){
+  .article_right{display:none}
+  .article_right{padding-top:0}}
+  .my_tit{position:relative;padding-bottom:10px;border-bottom:4px solid #000;font-size:22px;color:#000;line-height:30px;font-weight:500}
+  .my_tit span{font-size:13px;line-height:30px}
+  .my_tit.nobor{padding:0;border:0}
+
+  @media screen and (max-width:540px){
+  .article_right{overflow:initial}}
+  .my_reconfirm   .btn_bx{padding-top:20px;border-top:1px solid #d4d4d4}
+  .my_reconfirm   .btn_bx   .btn_black,
+  .my_reconfirm   .btn_bx   .btn_bor{width:82px;height:40px;border-radius:2px}
+  .reconfirm{padding:38px 0}
+  .reconfirm   .inpbx{display:inline-block;width:200px}
+
+
+  

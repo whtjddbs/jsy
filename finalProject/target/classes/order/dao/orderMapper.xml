@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="orderSQL">
+	 <select id="getInfoList" parameterType="String" resultType="map">
+	 	select * from item 
+		join shoppingbag using(seq)
+		where seq in
+		(select seq from shoppingbag where id=#{id})
+	 </select>
+	
+	<delete id="shoppingBagDelete" parameterType="map">
+		delete shoppingBag where seq=#{seq} and color=#{color} and size1=#{size1} 
+		<if test="size2 != ''">
+		and size2=#{size2}
+		</if>
+	</delete>
+	
+	<insert id="addShoppingBag" parameterType="map">
+		insert into shoppingbag values(#{seq}, #{id}, #{color}, #{size1}, #{size2}, #{count}, sysdate+60)
+	</insert>
+ </mapper>

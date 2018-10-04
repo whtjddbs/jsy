@@ -1,0 +1,85 @@
+@charset "UTF-8";
+
+a {
+    text-decoration: none;
+	min-width: 82px; 
+	padding: 0 17px; 
+	border: 1px solid #303033; 
+	background: #303033; 
+	font-size: 13px; 
+	color: #fff; 
+	line-height: 40px; 
+	display: inline-block; 
+	box-sizing: border-box;
+}
+
+.h_tit {
+    position: relative;
+    font-size: 22px;
+    color: #000;
+    line-height: 20px;
+    font-weight: 500;
+}
+
+.info {
+	display: table; 
+	width:100%; 
+	border-top: 4px solid #000; 
+	border-bottom: 1px solid #d4d4d4; 
+	font-weight: 700;
+}
+
+.info p {
+    display: block;
+    -webkit-margin-before: 1em;
+    -webkit-margin-after: 1em;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+    display: table-cell;
+    min-height: 50px;
+    text-align: left;
+    vertical-align: middle;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.my_grade[_myPage] ul[_myPage]{padding: 0px;overflow:hidden; margin: 0px;}
+.my_grade[_myPage] li[_myPage]{padding: 0px;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end;-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end;float:left;position:relative;width:25%;height:150px;box-sizing:border-box;text-align:left}
+.my_grade[_myPage] li[_myPage]:first-child{width:50%}
+.my_grade[_myPage] li[_myPage] a[_myPage]{display:block;width:100%}
+.my_grade[_myPage] li[_myPage]:before{position:absolute;top:27px;left:0;width:1px;height:100px;background:#5d5d5d;content:""}
+.my_grade[_myPage] li[_myPage]:first-child:before{display:none}
+.my_grade[_myPage] li[_myPage] .benefit_show[_myPage]{position:absolute;right:26px;bottom:24px;width:auto;font-weight:300;line-height:17px;text-align:center}
+.my_grade[_myPage] li[_myPage] span[_myPage]{color:#a0a0a0}
+.my_grade[_myPage] li[_myPage] span[_myPage]:after{display:inline-block;clear:both;width:5px;height:5px;margin-bottom:2px;margin-left:3px;-webkit-transform:rotate(45deg);transform:rotate(45deg);border-top:1px solid #a0a0a0;border-right:1px solid #a0a0a0;content:""}
+.my_grade[_myPage] li[_myPage] em[_myPage]{font-style: normal;font-size:50px;font-weight:400;color:#fff;line-height:1.3;vertical-align:text-bottom;-webkit-transition:font-size .25s ease-in-out;transition:font-size .25s ease-in-out}
+.my_grade[_myPage] .btn_more[_myPage]{display:none}
+@media screen and (min-width:541px){
+	.my_grade[_myPage]{position:relative;background:#303033}
+	.my_grade[_myPage]   li[_myPage]   span[_myPage]{display:inline-block;position:absolute;top:24px;left:21px;font-size:14px;font-weight:600}
+	.my_grade[_myPage]   li[_myPage]   em[_myPage]{text-align:right}
+	.my_grade[_myPage]   li[_myPage]   .benefit_show[_myPage]{padding:8px 20px 7px;border:1px solid #6d6d6d;border-radius:17px;font-size:14px;color:#fff}
+}
+@media screen and (max-width:1550px){
+	.my_grade[_myPage] li[_myPage]   em[_myPage]{font-size:40px}
+}
+@media screen and (max-width:1300px){
+	.my_grade[_myPage] li[_myPage]   em[_myPage]{font-size:34px}
+	.my_grade[_myPage] li[_myPage]   .benefit_show[_myPage]{bottom:20px}
+}
+@media screen and (max-width:1220px){
+	.my_grade[_myPage] li[_myPage]   em[_myPage]{font-size:24px}
+	.my_grade[_myPage] li[_myPage]   .benefit_show[_myPage]{bottom:18px}
+}
+@media screen and (max-width:540px){
+	.my_grade[_myPage]{overflow:hidden;margin:0 -20px}
+	.my_grade[_myPage] ul[_myPage]{margin-right:-1px}
+	.my_grade[_myPage] li[_myPage]{width:50%;height:auto;min-height:86px;border:1px solid #e4e4e4;border-width:0 1px 1px 0;padding:17px 20px 5px;text-align:left}
+	.my_grade[_myPage] li[_myPage]:first-child{width:100%}
+	.my_grade[_myPage] li[_myPage]:first-child, .my_grade[_myPage] li[_myPage]:nth-child(2){border-top:0}
+	.my_grade[_myPage] li[_myPage]:before{display:none}
+	.my_grade[_myPage] li[_myPage]   .benefit_show[nth-child]{right:20px;bottom:24px;padding:12px 24px 11px;border-radius:40px;background:#f6f6f6;font-size:13px;color:#474747}
+	.my_grade[_myPage] li[_myPage]   span[nth-child]{display:block;position:static;font-weight:300;font-size:14px}
+	.my_grade[_myPage] li[_myPage]   span[nth-child]:after{display:none}
+	.my_grade[_myPage] li[_myPage]   em[nth-child]{display:block;margin-top:12px;font-size:32px;font-weight:600;color:#000;line-height:1.233}
+}

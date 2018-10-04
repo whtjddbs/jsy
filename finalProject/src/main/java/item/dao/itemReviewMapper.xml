@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="itemReviewSQL">
+ 	<!-- 리뷰 작성가능 리스트 -->
+ 	<select id="reviewAvailableList" parameterType="String" resultType="map">
+ 		select serial, seq, main_codename, img, item.name, color, size1, size2, logtime 
+ 		from buylist
+		join serialmapper using (serial)
+		join item using (seq)
+		where id=#{id} and status='배송완료'
+		and logtime > sysdate-90
+		and (serial,seq) not in 
+		(select serial,seq from item_review where id=#{id})
+ 	</select>
+ 	<!-- 작성한 리뷰 리스트-->
+ 	<select id="reviewList" parameterType="String" resultType="map">
+ 		select serial, seq, main_codename, img, item.name, color, size1, size2, logtime
+ 		from buylist
+		join serialmapper using (serial)
+		join item using (seq)
+		where id=#{id} and status='배송완료'
+		and logtime > sysdate-90
+		and (serial,seq) in 
+		(select serial,seq from item_review where id=#{id})
+ 	</select>
+ 	<!-- 리뷰 상세보기 -->
+ 	<select id="getReviewDetail" parameterType="map" resultType="item_review">
+ 		select * from item_review where id=#{id} and serial=#{serial} and seq=${seq}
+ 	</select>
+ </mapper>

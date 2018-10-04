@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:component-scan base-package="main.controller" />
+	<context:component-scan base-package="member.controller" />
+	<context:component-scan base-package="item.controller" />
+	<context:component-scan base-package="myPage.controller" />
+	<context:component-scan base-package="admin.controller" />
+	<context:component-scan base-package="customerService.controller" />
+	<context:component-scan base-package="itemView.controller" />
+	<context:component-scan base-package="order.controller"/>
+	<context:component-scan base-package="Handcoding.Controller"/>
+
+	<mvc:annotation-driven />
+
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="suffix" value=".jsp" />
+	</bean>
+
+	<!-- jsonView -->
+	<bean id="jsonView" class="org.springframework.web.servlet.view.json.MappingJackson2JsonView">
+		<property name="contentType" value="text/html;charwet=UTF-8" />
+	</bean>
+
+	<bean id="beanNameResolver" class="org.springframework.web.servlet.view.BeanNameViewResolver">
+		<property name="order" value="0" />
+	</bean>
+
+	<!-- file upload -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver" p:maxUploadSize="5000000" />
+
+    <!-- Interceptor 설정 -->
+    <mvc:interceptors> 
+    	<mvc:interceptor> 
+    		<mvc:mapping path="/**"/>
+    		<mvc:exclude-mapping path="/member/loginForm.do"/>
+    		<mvc:exclude-mapping path="/member/login.do"/>
+    		<mvc:exclude-mapping path="/member/beLoginForm.do"/>
+    		<mvc:exclude-mapping path="/order/*.do"/>
+    		<mvc:exclude-mapping path="/myPage/guestTracking.do"/>
+    		<mvc:exclude-mapping path="/customerService/*.do"/>
+    		<bean id="authInterceptor" class="com.conf.AuthInterceptor"/>
+    	</mvc:interceptor>
+    			
+		<mvc:interceptor>
+			<mvc:mapping path="/myPage/*.do"/>
+			<mvc:mapping path="/customerService/*.do"/>
+			<mvc:exclude-mapping path="/customerService/notice.do"/>
+			<mvc:exclude-mapping path="/customerService/notice*.do"/>
+			<mvc:exclude-mapping path="/myPage/guestTracking.do"/>
+			<mvc:exclude-mapping path="/myPage/getSerialMapper.do"/>
+			<bean id="myPageInterceptor" class="com.conf.MyPageInterceptor"></bean>
+		</mvc:interceptor>
+		
+		<mvc:interceptor>
+			<mvc:mapping path="/admin/*.do"/>
+			<bean id="adminInterceptor" class="com.conf.AdminInterceptor"></bean>
+		</mvc:interceptor>
+		
+		<mvc:interceptor>
+			<mvc:mapping path="/order/*.do"/>
+			<bean id="orderInterceptor" class="com.conf.OrderInterceptor"></bean>
+		</mvc:interceptor>
+		
+  	</mvc:interceptors>
+
+
+
+</beans>

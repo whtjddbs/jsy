@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="memberSQL">
+ 	<!-- 로그인 -->
+	<select id="login" parameterType="java.util.Map" resultType="member">
+		select * from member where id=#{id} and pwd=#{pwd}
+	</select>
+	
+	<!-- 회원가입 -->
+	<insert id="write" parameterType="member" >
+		insert into member values(#{name}
+								, #{id}
+								, #{pwd}
+								, #{tel1}
+								, #{tel2}
+								, #{tel3}
+								, #{email}
+								, #{zipcode}
+								, #{addr1}
+								, #{addr2}
+								, 0
+								, 0
+								, 0
+								, sysdate)
+	</insert>
+	
+	<!-- 아이디 중복체크 / 한 사람 데이터 -->
+	<select id="getMember" parameterType="String" resultType="member">
+		select * from member where id=#{id}
+	</select>
+	
+	<!-- 회원정보수정 -->
+	<update id="modify" parameterType="member">
+		update member set name=#{name}
+						, pwd=#{pwd}
+						, tel1=#{tel1}
+						, tel2=#{tel2}
+						, tel3=#{tel3}
+						, email=#{email}
+						, zipcode=#{zipcode}
+						, addr1=#{addr1}
+						, addr2=#{addr2} where id=#{id}
+	</update>
+	
+	<!-- 이메일 인증 -->
+	<select id="finedOneByEmail" parameterType="String" resultType="member">
+		select * from member where email=#{email} and code=0
+	</select>
+	
+	<!-- 비밀번호 변경 -->
+	<update id="newpwdUpdate" parameterType="java.util.Map">
+		update member set pwd=#{pwd} where id=#{id}
+	</update>
+
+	<!-- 위시 리스트 -->
+	<select id="getWishList" parameterType="String" resultType="String">
+		select seq from wishlist where id=#{id}		
+	</select>
+	<!-- 위시 리스트 추가 -->
+	<insert id="addWishList" parameterType="map">
+		insert into wishlist values(${seq}, #{id})
+	</insert>
+	<!-- 위시 리스트 삭제 -->	
+	<delete id="deleteWishList" parameterType="map">
+		delete wishlist where seq=${seq} and id=#{id}
+	</delete>
+	<!-- 위시 리스트 개수 -->
+	<select id="getWishListTotalA" parameterType="String" resultType="int">
+		select count(*) from wishlist where id=#{id}
+	</select>
+	
+	<!-- 회원탈퇴 -->
+	<delete id="byeMember" parameterType="java.util.Map">
+		begin
+			delete member where id=#{id} and pwd=#{pwd};
+		end;
+	</delete>
+	
+	<!-- 주문시 기본배송지 수정 -->
+	<select id="updateAddr" parameterType="buylist">
+		update member set zipcode=#{zipcode}
+						, addr1=#{addr1}
+						, addr2=#{addr2} where id=#{id}
+	</select>
+
+	<!-- 비회원 주문 -->
+	<insert id="addGuest" parameterType="member">
+		insert into member values(#{name}
+							, 'guest'||guest_seq.nextval
+							, #{pwd}
+							, #{tel1}
+							, #{tel2}
+							, #{tel3}
+							, #{email}
+							, #{zipcode}
+							, #{addr1}
+							, #{addr2}
+							, 1
+							, 0
+							, 0
+							, sysdate)
+	</insert>
+	<select id="getGuestId" resultType="String">
+		select 'guest'||guest_seq.currval from dual
+	</select>
+	
+	<!-- 비회원 조회 -->
+	<select id="getGuest" parameterType="map" resultType="member">
+		select * from member where (id,pwd) in 
+		(select id,#{pwd} from buylist where serial=#{serial})
+	</select>
+</mapper>

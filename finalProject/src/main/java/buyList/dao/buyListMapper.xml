@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="buyListSQL">
+	<select id="getOneBuylist" parameterType="String" resultType="buylist">
+		select * from buylist where serial=#{serial}
+	</select>
+	
+	<select id="getAllBuyList" resultType="buylist">
+		select * from buylist order by serial desc
+	</select>
+	
+	<select id="getDeliveryDetail" parameterType="String" resultType="java.util.Map">
+		select main_codename, img, item.name, color, size1, size2, serialmapper.price, serialmapper.count 
+		from serialmapper
+		join buylist using(serial)
+		join item using(seq)
+		where serial=#{serial}
+	</select>
+	
+	<select id="getDeliveryTotalA" parameterType="map" resultType="int">
+		select count(*) from buylist
+		where status like '%${status}%'
+		<if test="id != null">
+		and id = #{id}
+		</if>
+		<if test="startDate != null and endDate != null">
+		and logtime between #{startDate} and to_date(#{endDate}, 'YYYY-MM-DD')+1
+		</if>
+		order by serial desc
+	</select>
+	
+	<select id="getBuyList" parameterType="map" resultType="buylist">
+		select * from
+		(select rownum rn, tt.* from
+		(select * from buylist
+		where status like '%${status}%'
+		<if test="id != null">
+		and id = #{id}
+		</if>
+		<if test="startDate != null and endDate != null">
+		and logtime between #{startDate} and to_date(#{endDate}, 'YYYY-MM-DD')+1
+		</if>
+		order by serial desc)tt
+		)where rn between ${startNum} and ${endNum}
+	</select>
+	
+	<update id="changeStatus" parameterType="map">
+		update buylist set status=#{status}
+		<if test="parcel != null">
+		,parcel=#{parcel} ,parcel_code=#{parcel_code} where serial=#{serial}
+		</if>
+		<if test="serials != null"> 
+		where serial in
+		<foreach collection="serials" item="serial" separator="," open="(" close=")">
+			#{serial}
+		</foreach>
+		</if>
+	</update>
+	
+	<select id="SalesList" parameterType="java.util.Map" resultType="java.util.Map">
+		select * from
+		(select rownum rn, tt.* from
+		(select * from serialmapper
+		join buylist using(serial)
+		join item using(seq)
+		where main_codename like '%${status1}%' and sub_codename like '%${status2}%'
+		and logtime between #{startDate} and to_date(#{endDate}, 'YYYY-MM-DD')+1
+		order by serial desc)tt
+		)where rn between ${startNum} and ${endNum}
+	</select>
+	
+	<select id="searchText" parameterType="java.util.Map" resultType="java.util.Map">
+		select * from
+		(select rownum rn, tt.* from(
+		select * from serialmapper
+		join buylist using(serial)
+		join item using(seq)
+		where name like '%${text}%' order by serial desc)tt 
+		)where rn between ${startNum} and ${endNum}
+	</select>
+	
+	<select id="getSalesTotalA" parameterType="java.util.Map" resultType="int">
+		select count(*) from serialmapper
+		join buylist using(serial)
+		join item using(seq)
+		where main_codename like '%${status1}%' and sub_codename like '%${status2}%'
+		and logtime between #{startDate} and to_date(#{endDate}, 'YYYY-MM-DD')+1
+		order by serial desc
+	</select>
+	
+	<select id="getSearchTotalA" parameterType="java.util.Map" resultType="int">
+		select count(*) from serialmapper
+		join buylist using(serial)
+		join item using(seq)
+		where name like '%${text}%' order by serial desc
+	</select>
+	
+	<!-- 로그인한 회원의 배송중인 주문의 개수 -->
+	<select id="getDeliveryCountOfMember" parameterType="String" resultType="int">
+		select count(*) from buylist where id=#{id} and status='배송중'
+	</select>
+	
+	<select id="getBuyListCount" parameterType="map" resultType="map">
+		select count(*) as count, sum(sum) as sum from (
+		select serial, id, logtime, status, sum(price) as sum from buylist
+		join serialmapper using (serial)
+		group by (serial, id, logtime, status)
+		having id=#{id} and status='배송완료'
+		and logtime between #{startDate} and to_date(#{endDate}, 'YYYY-MM-DD')+1
+		)
+	</select>
+	
+	<!-- myPageIndex 최근 5개 주문리스트-->
+	<select id="get5BuyList" parameterType="String" resultType="map">
+		select point, buylist.logtime, serial, main_codename, img, item.name, color, serialmapper.price, serialmapper.count 
+		from buylist
+		join serialmapper using(serial)
+		join item using (seq)
+		where serial in 
+		(select serial from (select * from buylist where id=#{id} order by serial desc) where rownum &lt;= 5)
+		order by serial desc
+	</select>
+	
+	<select id="getSerialCount" parameterType="String" resultType="map">
+		select count(*) as totalCount, sum(price*count) as totalPrice from serialmapper where serial=#{serial}
+	</select>
+	
+	<!-- checkout -->
+	<select id="getoriginList" parameterType="String" resultType="buylist">
+		select * from buylist where id=#{id}
+	</select>
+	
+	<!-- 나의 마일리지 -->
+	<select id="getTotalPoint" parameterType="String" resultType="int">
+		select sum(price*count/100) as totalPoint from serialmapper join buylist using(serial) where id=#{id}
+	</select>
+	<select id="getTotalUsedPoint" parameterType="String" resultType="int">
+		select sum(point) from buylist where id=#{id}
+	</select>
+	<select id="myPointInfo" parameterType="java.util.Map" resultType="java.util.Map">
+		select * from(
+		select rownum rn,tt.*from
+		(select serial,  sum(mileage) as point,sum(usingpoint) as usedpoint,id,time from(
+		select serial, (price*count)*0.01 as mileage, buylist.POINT as usingpoint,buylist.LOGTIME as time,buylist.id as id  from serialmapper join buylist using(serial))
+		group by serial,time,id
+		having id=#{id}
+		order by time desc)tt)
+		where rn between ${startNum} and ${endNum}
+	</select>
+	<select id="getPointTotalA" resultType="int" parameterType="java.util.Map">
+		select  count(*) from (select * from(
+		(select serial,  sum(mileage) as point,sum(usingpoint) as usedpoint,id,time from(
+		select serial, (price*count)*0.01 as mileage, buylist.POINT as usingpoint,buylist.LOGTIME as time,buylist.id as id  from serialmapper join buylist using(serial))
+		group by serial,time,id
+		having id=#{id})tt))
+	</select>
+	<select id="getUsedPointTotalA" resultType="int" parameterType="java.util.Map">
+		select count(*) from buylist where id=#{id} and NOT POINT=0
+	</select>
+	<select id="myUsedPointInfo" resultType="java.util.Map" parameterType="java.util.Map">
+		select * from(
+		select rownum rn,tt.*from(
+		select * from buylist where id=#{id} and NOT POINT=0
+		order by logtime desc
+		)tt)
+		where rn between ${startNum} and ${endNum}
+	</select>
+	
+	<!-- 상품구매 checkout -->
+	<insert id="buyItems" parameterType="buylist">
+		BEGIN
+			INSERT INTO buylist VALUES(to_char(sysdate, 'YYYYMMDD')||buylist_seq.nextval, #{id}, #{name}, #{tel1}, #{tel2}, #{tel3}, #{email}, #{zipcode}, #{addr1}, #{addr2}, '', '', #{comments}, ${point}, '결제완료', sysdate);
+			UPDATE member SET point=point-${point} WHERE id=#{id};
+		END;
+	</insert>
+	<insert id="InsertSerialmapper" parameterType="map">
+		BEGIN
+			INSERT INTO serialmapper VALUES(to_char(sysdate, 'YYYYMMDD')||buylist_seq.currval, ${seq}, #{color}, #{size1}, #{size2}, ${price}, ${count});
+			UPDATE item_info SET qty=qty-${count} WHERE seq=${seq} and color=#{color} and size1=#{size1}
+			<if test="size2 != ''">
+				and size2=#{size2}
+			</if>
+			;
+			DELETE shoppingbag WHERE id=#{id} and seq=${seq} and color=#{color} and size1=#{size1}
+			<if test="size2 != ''">
+				and size2=#{size2}
+			</if>
+			;
+		END;
+	</insert>
+	<update id="savePoint" parameterType="map">
+		UPDATE member SET point=point+${point} WHERE id=#{id}
+	</update>
+	<select id="getLatestSerial" resultType="String">
+		select to_char(sysdate, 'YYYYMMDD')||buylist_seq.currval from dual
+	</select>
+	
+	<select id="getMtmWrite" parameterType="java.util.Map" resultType="java.util.Map">
+		select * from(
+		select rownum rn,tt.* from(
+	        select serial, logtime, sum(totalprice) as totalprice,LISTAGG(name, ', ') WITHIN GROUP (ORDER BY name) as name, status, sum(count) as cnt from(
+			select serial, logtime, serialmapper.price*serialmapper.count as totalPrice, item.name, status, count from buylist
+			join serialmapper using (serial)
+			join item using (seq) where id=#{id}
+	        ) group by (serial,logtime,status)
+	        )tt 
+	        )where rn between ${startNum} and ${endNum}
+	</select>
+	
+</mapper>

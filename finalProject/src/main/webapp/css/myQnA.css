@@ -1,0 +1,249 @@
+@charset "UTF-8";
+
+.h_tit {
+    position: relative;
+    font-size: 22px;
+    color: #000;
+    line-height: 20px;
+    font-weight: 500;
+}
+
+.info {
+	display: table; 
+	width:100%; 
+	border-top: 4px solid #000; 
+	border-bottom: 1px solid #d4d4d4; 
+	font-weight: 700;
+}
+
+.info p {
+    display: block;
+    -webkit-margin-before: 1em;
+    -webkit-margin-after: 1em;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+    display: table-cell;
+    min-height: 50px;
+    text-align: left;
+    vertical-align: middle;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.info2 {
+	 border-bottom: 1px solid #d4d4d4;
+	 display: table; 
+	 width: 100%;
+}
+
+.info2 p {
+    display: block;
+    -webkit-margin-before: 1em;
+    -webkit-margin-after: 1em;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+    display: table-cell;
+    min-height: 50px;
+    vertical-align: middle;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.qa_btn {
+	border: 1px solid #d4d4d4;
+	color: #5d5d5d;
+	background: transparent;
+    cursor: pointer;
+    height: 25px;
+	font-size: 12px;
+	border-radius: 2px;
+}
+
+.qa_click {
+	cursor: pointer;	
+}
+
+.info3 {
+	/*  display: none;  */
+	 padding: 0 100px 0 130px;
+	 position: relative;
+}
+
+.info4 {
+	 margin-top: 70px;
+	 padding: 0 100px 0 130px;
+	 position: relative;
+}
+
+.info3 p#p_content {
+    display: block;
+    -webkit-margin-before: 1em;
+    -webkit-margin-after: 1em;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+    display: table-cell;
+    min-height: 50px;
+    padding: 17px 60px 60px 200px;
+    vertical-align: middle;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.wrap_info34 {
+	padding:30px;
+	border-bottom: 1px solid #d4d4d4;
+	background: #f9f4f4;
+	display: none;
+}
+
+.styleQA {
+	font-size: 40px;
+    font-weight: 700;
+    color: #000;
+    line-height: 55px;
+    position: absolute;
+    top: -20px;
+    left: 50px
+}
+
+#currentPaging{
+	border-bottom: 1.5px solid #000;
+	cursor: pointer;
+	font-weight: 700;
+    color: #000;
+    text-decoration:none;
+	padding: 1px;
+	margin: 10px;
+}
+#paging{
+	text-decoration: none;
+	cursor: pointer;
+	color: #bcafaf;
+	text-decoration:none;
+	padding: 1px;
+	margin: 10px;
+}
+
+#myQnAPagingDiv {
+	margin-top:30px;
+}
+
+.qa_status {
+	font-weight:700px;
+	font-size:18px;
+	
+}
+
+#myQnADelete_frame {
+	background-color: rgba(255,255,255,0.8);
+    z-index: 1000;
+    opacity: 1;
+	display: none;
+    position: fixed;
+    overflow: hidden;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    text-align: center;
+}
+#myQnADelete {
+	width: inherit;
+    height: inherit;
+    padding: 30px 40px 40px 40px;
+    background-color: rgb(255, 255, 255);
+    box-shadow: rgba(0, 0, 0, 0.5) 20px 20px 80px 0px;
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    box-sizing: border-box;
+    width: 350px;
+    height: 150px;
+}
+
+#myQnADelete_closeBtn {
+	position: fixed;
+	top: 5px;
+	right: 5px;
+	cursor: pointer;
+}
+#myQnADelete_okBtn {
+	position: fixed;
+	width: 80px;
+	height: 30px;
+	bottom: 20px;
+	left: 80px;
+	border: 1px solid black;
+	background-color: black;
+	color: white;
+	outline: none;
+	cursor: pointer;
+}
+#myQnADelete_cancelBtn {
+	position: fixed;
+	width: 80px;
+	height: 30px;
+	bottom: 20px;
+	right: 80px;
+	border: 1px solid black;
+	background-color: black;
+	color: white;
+	outline: none;
+	cursor: pointer;
+}
+#dialog {
+	width: inherit;
+    height: inherit;
+    padding: 50px 40px 40px;
+    background-color: rgb(255, 255, 255);
+    box-shadow: rgba(0, 0, 0, 0.5) 20px 20px 80px 0px;
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    box-sizing: border-box;
+    min-width: 300px;
+}
+#dialog_closeBtn {
+	position: fixed;
+	top: 5px;
+	right: 5px;
+	cursor: pointer;
+}
+#deleteQnA_frame {
+	background-color: rgba(255,255,255,0.8);
+    z-index: 1000;
+    opacity: 1;
+	display: none;
+    position: fixed;
+    overflow: hidden;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    text-align: center;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
